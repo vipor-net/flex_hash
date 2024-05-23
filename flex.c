@@ -126,7 +126,7 @@ void SwapBytes(void *pv, unsigned int n)
     }
 }
 
-void gr_hash(const char* input, char* output) {
+void flex_hash(const char* input, char* output) {
 	uint32_t hash[64/4];
 	sph_blake512_context ctx_blake;
 	sph_bmw512_context ctx_bmw;
@@ -150,10 +150,13 @@ void gr_hash(const char* input, char* output) {
 
 	void *in = (void*) input;
 	int size = 80;
+    sph_keccak512_init(&ctx_keccak);
+    sph_keccak512(&ctx_keccak, in, size);
+    sph_keccak512_close(&ctx_keccak, hash);
 	uint8_t selectedAlgoOutput[15] = {0};
 	uint8_t selectedCNAlgoOutput[14] = {0};
-	getAlgoString(&input[4], 64, selectedAlgoOutput, 15);
-	getAlgoString(&input[4], 64, selectedCNAlgoOutput, 6);
+	getAlgoString(&hash, 64, selectedAlgoOutput, 15);
+	getAlgoString(&hash, 64, selectedCNAlgoOutput, 6);
 	//printf("previous hash=");
 	//print_hex_memory(&input[4], 64);
 	int i;
@@ -295,11 +298,11 @@ void gr_hash(const char* input, char* output) {
 				sph_whirlpool_close(&ctx_whirlpool, hash);
 				break;
 		}
-		if(cnSelection >= 0) {
-			memset(&hash[8], 0, 32);
-		}
 		in = (void*) hash;
 		size = 64;
 	}
+    sph_keccak256_init(&ctx_keccak);
+    sph_keccak256(&ctx_keccak, in, size);
+    sph_keccak256_close(&ctx_keccak, hash);
 	memcpy(output, hash, 32);
 }

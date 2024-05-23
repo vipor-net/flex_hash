@@ -139,8 +139,8 @@ static void do_turtle_lite_skein_hash(const void* input, size_t len, char* outpu
     assert(SKEIN_SUCCESS == r);
 }
 
-static void (* const extra_hashes[4])(const void *, size_t, char *) = {
-    do_turtle_lite_blake_hash, do_turtle_lite_groestl_hash, do_turtle_lite_jh_hash, do_turtle_lite_skein_hash
+static void (* const extra_hashes[3])(const void *, size_t, char *) = {
+    do_turtle_lite_blake_hash, do_turtle_lite_groestl_hash, do_turtle_lite_skein_hash
 };
 
 extern int aesb_single_round(const uint8_t *in, uint8_t*out, const uint8_t *expandedKey);
@@ -289,7 +289,7 @@ void cryptonightturtlelite_hash(const char* input, char* output, uint32_t len, i
     memcpy(ctx->state.init, ctx->text, INIT_SIZE_BYTE);
     hash_permutation(&ctx->state.hs);
     /*memcpy(hash, &state, 32);*/
-    extra_hashes[ctx->state.hs.b[0] & 3](&ctx->state, 200, output);
+    extra_hashes[ctx->state.hs.b[0] & 2](&ctx->state, 200, output);
     oaes_free((OAES_CTX **) &ctx->aes_ctx);
 }
 
